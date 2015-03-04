@@ -7,6 +7,7 @@ from scipy.signal import gaussian
 LEN = 640
 C = LEN/1.325
 D = 1.157*C
+dy = 5
     
 def angle(x):
     return np.arctan(x/D)
@@ -27,13 +28,17 @@ class Data(object):
         self.running = False
         self.done = False
         self.img = None
+        self.showimg = None
         self.data = None
-        self.starttime = None;
-        self.currtime = None;
+        self.starttime = None
+        self.currtime = None
+
+    def hrange(self):
+        return np.arange(self.h-dy, self.h+dy+1)
 
     def gendata(self):
         self.w = self.img.shape[1]
-        self.y = self.img[self.h,:,2]
+        self.y = self.img[self.hrange(),:,2].sum(axis=0)/(2.*dy)
         plot = np.zeros((256, self.w, 3), np.uint8)
         for i in range(self.w):
             plot[255-self.y[i], i]=(0,0,255)
@@ -57,6 +62,13 @@ class Data(object):
                 else:
                     self.data = np.array(new)
 
+    def dispimg(self):
+        self.showimg = np.copy(self.img)
+        cv2.line(self.showimg, (0, self.h), (639, self.h), (0,0,255))
+        cv2.line(self.showimg, (0, self.h-dy), (639, self.h-dy), (0,255,0))
+        cv2.line(self.showimg, (0, self.h+dy), (639, self.h+dy), (0,255,0))
+        cv2.imshow('pic', self.showimg)
+
     def onmousepic(self, event, x, y, flags, param):
         if self.analyzing:
             return
@@ -66,6 +78,8 @@ class Data(object):
         if event == cv2.EVENT_LBUTTONDOWN:
             self.h = y
             self.gendata()
+            self.dispimg()
+
         elif event == cv2.EVENT_RBUTTONDOWN:
             self.analyzing = not (self.analyzing or self.done)
             print "Analyzing: ", self.analyzing
@@ -102,7 +116,11 @@ class Data(object):
 
             imgname = self.path+imgname
             self.img = cv2.imread(imgname)
-            cv2.imshow('pic', self.img)
+
+            if self.showimg is None:
+                cv2.imshow('pic', self.img)
+            else:
+                self.dispimg()
 
             if self.h is not None:
                 self.gendata()
