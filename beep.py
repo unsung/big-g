@@ -45,7 +45,4 @@ while curr-start < duration:
 	cv2.imwrite(out, cam_capture)
 	sleep(delay)
 
-###################
-# so long suckers #
-###################
 del(cam)
