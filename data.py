@@ -15,7 +15,21 @@ L = 4.235
 m = 0.015
 I = 2*m*d*d
 dy = 5
-    
+
+"""
+LEN = 1235
+C = LEN/1.322
+D = 1.221*C
+pi = np.pi
+r = 0.045
+d = 0.05
+M = 1.438
+L = 4.235
+m = 0.015
+I = 2*m*d*d
+dy = 10
+"""
+
 def angle(x):
     return np.arctan(x/D)
 
@@ -78,6 +92,7 @@ class Data(object):
                     self.data = np.append(self.data, new, axis=0)
                 else:
                     self.data = np.array(new)
+                #for x in np.arange(1280):
                 for x in np.arange(640):
                     self.calcimg[255-self.gauss(x,params[0],params[1],params[2]),x]=(0,255,0)
                 cv2.imshow('data', self.calcimg)
@@ -91,9 +106,15 @@ class Data(object):
 
     def dispimg(self):
         self.showimg = np.copy(self.img)
-        cv2.line(self.showimg, (0, self.h), (639, self.h), (0,0,255))
+        """
+        cv2.line(self.showimg, (0, self.h), (1279, self.h), (0,0,255))
+        cv2.line(self.showimg, (0, self.h-dy), (1279, self.h-dy), (0,255,0))
+        cv2.line(self.showimg, (0, self.h+dy), (1279, self.h+dy), (0,255,0))
+        """
+        cv2.line(self.showimg, (0, self.h),    (639, self.h), (0,0,255))
         cv2.line(self.showimg, (0, self.h-dy), (639, self.h-dy), (0,255,0))
         cv2.line(self.showimg, (0, self.h+dy), (639, self.h+dy), (0,255,0))
+
         cv2.imshow('pic', self.showimg)
 
     def onmousepic(self, event, x, y, flags, param):
@@ -132,14 +153,16 @@ class Data(object):
 
     def calcsin(self):
         t,x,s= self.data.T
-        return curve_fit(self.sin, t, x, p0 = [1,0,600,0], sigma = s, absolute_sigma=True)
+        return curve_fit(self.sin, t, x, p0 = [300,1,300,1], sigma = s, absolute_sigma=True)
+        #return curve_fit(self.sin, t, x, p0 = [500,1,600,1], sigma = s, absolute_sigma=True)
 
     def dampsin(self, t, A, B, T, d, b):
         return A*np.exp(-b*t/(2*I))*np.sin(2.*np.pi*t/T + d) + B
 
     def calcdampsin(self):
         t,x,s= self.data.T
-        return curve_fit(self.dampsin, t, x, p0 = [1,0,600,0,.11], sigma = s, absolute_sigma=True)
+        return curve_fit(self.dampsin, t, x, p0 = [300,1,300,1,.11], sigma = s, absolute_sigma=True)
+        #return curve_fit(self.dampsin, t, x, p0 = [500,1,600,1,.11], sigma = s, absolute_sigma=True)
 
     def run(self):
         for imgname in sorted(os.listdir(self.path)):

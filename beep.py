@@ -14,6 +14,9 @@ cam = cv2.VideoCapture(cam_port)
 try: s = sys.argv[1]
 except: exit()
 
+cam.set(3, 1280)
+cam.set(4, 720)
+
 def get_image():
 	retval, im = cam.read()
 	return im
@@ -25,7 +28,7 @@ for i in xrange(ramp_frames):
 # create a home   #
 ###################
 
-outpath = s + strftime("%b-%d-%y_%H-%M-%S/")
+outpath = strftime("%b-%d-%y_%H-%M-%S")+s+"/"
 start = time()
 curr = start
 
